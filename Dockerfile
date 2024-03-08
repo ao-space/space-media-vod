@@ -1,8 +1,9 @@
-FROM alpine:3.12.0 AS base_image
+FROM xfan1024/openeuler:23.03-light AS base_image
 
 FROM base_image AS build
 
-RUN apk add --no-cache curl build-base openssl openssl-dev zlib-dev linux-headers pcre-dev git
+RUN yum install -y curl gcc openssl openssl-devel zlib-devel kernel-headers pcre-devel git make
+
 RUN mkdir nginx
 
 RUN git clone https://github.com/ao-space/nginx-vod-module.git
@@ -24,7 +25,7 @@ RUN make install
 RUN rm -rf /usr/local/nginx/html /usr/local/nginx/conf/*.default
 
 FROM base_image
-RUN apk add --no-cache ca-certificates openssl pcre zlib
+RUN yum install -y ca-certificates openssl pcre zlib
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY nginx.conf /usr/local/nginx/conf/nginx.conf
 ENTRYPOINT ["/usr/local/nginx/sbin/nginx"]
